@@ -25,27 +25,56 @@ final class NumbersController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = ConfigConstants.viewBackgroundColor
         configureController()
+        startLogic()
     }
     
     // MARK: - Private methods
     private func configureController() {
         title = ConfigConstants.mainTitle
     }
+    
+    private func startLogic() {
+        NumGeneratorService.shared.packageSize = 50
+        
+        let newNumbersPrime = NumGeneratorService.shared.getPrimeNumbers(from: 0)
+        let newNumbersFib = NumGeneratorService.shared.getFibanacciNumbers(from: 0)
+        
+        contentView.insertNewNumbers(newNumbersPrime, into: .prime)
+        contentView.insertNewNumbers(newNumbersFib, into: .fibanacci)
+    }
 }
 
 // MARK: - Protocol execution
-extension NumbersController: NumbersControllerProtocol {
-    
-}
+extension NumbersController: NumbersControllerProtocol {}
 
+// MARK: - View delegate execution
 extension NumbersController: NumbersViewDelegate {
     func didSelectSegment(_ segment: Any) {
         guard let segment = segment as? CollectionType else { return }
+        selectedType = segment
         switch segment {
         case .prime: contentView.showPrimeCollection()
         case .fibanacci: contentView.showFibanacciCollection()
+        }
+    }
+    
+    func loadMorePrimeNumbers(from lastNumber: Int) {
+        let utilityQueue = DispatchQueue.global(qos: .utility)
+        utilityQueue.async { [weak self] in
+            guard let self = self else { return }
+            let newNumbers = NumGeneratorService.shared.getPrimeNumbers(from: lastNumber)
+            self.contentView.insertNewNumbers(newNumbers, into: .prime)
+        }
+    }
+    
+    func loadMoreFibanacciNumbers(from lastNumber: Int) {
+        let utilityQueue = DispatchQueue.global(qos: .utility)
+        utilityQueue.async { [weak self] in
+            guard let self = self else { return }
+            let newNumbers = NumGeneratorService.shared.getFibanacciNumbers(from: lastNumber)
+            self.contentView.insertNewNumbers(newNumbers, into: .fibanacci)
         }
     }
 }
@@ -54,6 +83,7 @@ extension NumbersController: NumbersViewDelegate {
 extension NumbersController {
     struct ConfigConstants {
         static var mainTitle: String = "Числовой контроллер"
+        static var viewBackgroundColor: UIColor { .systemGray3 }
         static var segmentedItems: [CollectionType] { [.prime, .fibanacci] }
     }
 }

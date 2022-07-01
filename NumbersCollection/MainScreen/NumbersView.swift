@@ -9,6 +9,9 @@ import UIKit
 
 protocol NumbersViewDelegate: AnyObject {
     func didSelectSegment(_ segment: Any)
+    
+    func loadMorePrimeNumbers(from lastNumber: Int)
+    func loadMoreFibanacciNumbers(from lastNumber: Int)
 }
 
 protocol NumbersViewProtocol: UIView {
@@ -16,6 +19,8 @@ protocol NumbersViewProtocol: UIView {
     
     func showPrimeCollection()
     func showFibanacciCollection()
+    
+    func insertNewNumbers(_ numbers: [Int], into collection: CollectionType)
 }
 
 final class NumbersView: UIView {
@@ -24,6 +29,9 @@ final class NumbersView: UIView {
     weak var delegate: NumbersViewDelegate?
     
     private let segmentItems: [CollectionType]
+    
+    private var primeNumbers = [Int]()
+    private var fibanacciNumbers = [Int]()
     
     // MARK: - Views
     private lazy var segmentedControl: UISegmentedControl = {
@@ -35,13 +43,13 @@ final class NumbersView: UIView {
     }()
     
     private lazy var numCollection: NumbersCollection = {
-        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout(), type: .prime)
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
     
     private lazy var fibCollection: NumbersCollection = {
-        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout(), type: .fibanacci)
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
@@ -56,6 +64,7 @@ final class NumbersView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     // MARK: - Private methods
     private func setupView() {
         numCollection.controlDelegate = self
@@ -112,11 +121,23 @@ extension NumbersView: NumbersViewProtocol {
             self.fibCollection.showSelf(true, animated: true, handler: nil)
         }
     }
+    
+    func insertNewNumbers(_ numbers: [Int], into collection: CollectionType) {
+        switch collection {
+        case .prime: numCollection.insertNewNumbers(numbers); primeNumbers.append(contentsOf: numbers)
+        case .fibanacci: fibCollection.insertNewNumbers(numbers); fibanacciNumbers.append(contentsOf: numbers)
+        }
+    }
 }
 
+// MARK: - Collection delegate execution
 extension NumbersView: NumbersCollectionDelegate {
-    func didDisplayPaginatorDetectorCell() {
-        print("Detector displayed")
+    func didDisplayPaginatorDetectorCell(_ type: CollectionType) {
+        guard let lastNumber = type == .prime ? primeNumbers.last : fibanacciNumbers.last else { return }
+        switch type {
+        case .prime: delegate?.loadMorePrimeNumbers(from: lastNumber)
+        case .fibanacci: delegate?.loadMoreFibanacciNumbers(from: lastNumber)
+        }
     }
 }
 
@@ -124,7 +145,6 @@ extension NumbersView: NumbersCollectionDelegate {
 extension NumbersView {
     struct Constants {
         static var backgroundColor: UIColor { .lightGray }
-        static var defaultAnimationDuration: CGFloat { 0.3 }
     }
 }
 

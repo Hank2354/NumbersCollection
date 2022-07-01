@@ -9,27 +9,29 @@ import Foundation
 import UIKit
 
 protocol NumbersCollectionDelegate: AnyObject {
-    func didDisplayPaginatorDetectorCell()
+    func didDisplayPaginatorDetectorCell(_ type: CollectionType)
 }
 
 protocol NumbersCollectionProtocol: UICollectionView {
     var controlDelegate: NumbersCollectionDelegate? { get set }
+    var collectionType: CollectionType { get }
     
     func showSelf(_ isShow: Bool, animated: Bool, handler: ((Bool) -> ())?)
+    
+    func insertNewNumbers(_ numbers: [Int])
 }
 
 final class NumbersCollection: UICollectionView {
     // MARK: - Properties
     weak var controlDelegate: NumbersCollectionDelegate?
-    
+    internal var collectionType: CollectionType
     private var numbers = [Int]()
     
     // MARK: - Init
-    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
+    init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout, type: CollectionType) {
+        self.collectionType = type
         super.init(frame: frame, collectionViewLayout: layout)
         configureCollection()
-        numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
-        reloadData()
     }
     
     required init?(coder: NSCoder) {
@@ -63,6 +65,14 @@ extension NumbersCollection: NumbersCollectionProtocol {
                 self.isUserInteractionEnabled = isShow
                 handler?(state)
             }
+        }
+    }
+    
+    func insertNewNumbers(_ numbers: [Int]) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.numbers.append(contentsOf: numbers)
+            self.reloadData()
         }
     }
 }
@@ -99,7 +109,9 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if indexPath.row + 1 == numbers.count - Constants.paginationDetectorPreset { controlDelegate?.didDisplayPaginatorDetectorCell() }
+        if indexPath.row + 1 == numbers.count - Constants.paginationDetectorPreset {
+            controlDelegate?.didDisplayPaginatorDetectorCell(collectionType)
+        }
     }
     
 }
@@ -117,7 +129,7 @@ extension NumbersCollection {
         
         static var cellID: String { .init(describing: NumCell.self) }
         
-        static var paginationDetectorPreset: Int { 6 }
-        static var defaultAnimationDuration: CGFloat { 0.3 }
+        static var paginationDetectorPreset: Int { 12 }
+        static var defaultAnimationDuration: CGFloat { 0.2 }
     }
 }
