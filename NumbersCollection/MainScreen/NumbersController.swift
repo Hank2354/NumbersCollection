@@ -28,6 +28,9 @@ final class NumbersController: UIViewController {
         view.backgroundColor = ConfigConstants.viewBackgroundColor
         configureController()
         startLogic()
+        print(Int64.max)
+        print(Int32.max)
+        print(Int8.max)
     }
     
     // MARK: - Private methods
@@ -36,10 +39,10 @@ final class NumbersController: UIViewController {
     }
     
     private func startLogic() {
-        NumGeneratorService.shared.packageSize = 50
+        NumGeneratorService.shared.packageSize = 30
         
         let newNumbersPrime = NumGeneratorService.shared.getPrimeNumbers(from: 0)
-        let newNumbersFib = NumGeneratorService.shared.getFibanacciNumbers(from: 0)
+        let newNumbersFib = NumGeneratorService.shared.getFibanacciNumbers(from: (0, 1))
         
         contentView.insertNewNumbers(newNumbersPrime, into: .prime)
         contentView.insertNewNumbers(newNumbersFib, into: .fibanacci)
@@ -69,11 +72,11 @@ extension NumbersController: NumbersViewDelegate {
         }
     }
     
-    func loadMoreFibanacciNumbers(from lastNumber: Int) {
+    func loadMoreFibanacciNumbers(from lastPair: (Int, Int)) {
         let utilityQueue = DispatchQueue.global(qos: .utility)
         utilityQueue.async { [weak self] in
             guard let self = self else { return }
-            let newNumbers = NumGeneratorService.shared.getFibanacciNumbers(from: lastNumber)
+            let newNumbers = NumGeneratorService.shared.getFibanacciNumbers(from: lastPair)
             self.contentView.insertNewNumbers(newNumbers, into: .fibanacci)
         }
     }

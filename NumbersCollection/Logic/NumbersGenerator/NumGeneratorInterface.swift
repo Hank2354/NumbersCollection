@@ -13,6 +13,6 @@ protocol NumGeneratorInterface: AnyObject {
     
     func getPrimeNumbers(from initValue: Int) -> [Int]
     
-    func getFibanacciNumbers(from initValue: Int) -> [Int]
+    func getFibanacciNumbers(from initPair: (Int, Int)) -> [Int]
 }
 

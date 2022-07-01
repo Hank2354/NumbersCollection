@@ -13,6 +13,7 @@ final class NumCell: UICollectionViewCell {
     private let numLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .center
         return label
     }()
     
@@ -41,5 +42,7 @@ final class NumCell: UICollectionViewCell {
     private func setupConstraints() {
         numLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         numLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        numLabel.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        numLabel.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
     }
 }

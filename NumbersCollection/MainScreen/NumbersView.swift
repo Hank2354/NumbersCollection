@@ -11,7 +11,7 @@ protocol NumbersViewDelegate: AnyObject {
     func didSelectSegment(_ segment: Any)
     
     func loadMorePrimeNumbers(from lastNumber: Int)
-    func loadMoreFibanacciNumbers(from lastNumber: Int)
+    func loadMoreFibanacciNumbers(from lastPair: (Int, Int))
 }
 
 protocol NumbersViewProtocol: UIView {
@@ -133,10 +133,15 @@ extension NumbersView: NumbersViewProtocol {
 // MARK: - Collection delegate execution
 extension NumbersView: NumbersCollectionDelegate {
     func didDisplayPaginatorDetectorCell(_ type: CollectionType) {
-        guard let lastNumber = type == .prime ? primeNumbers.last : fibanacciNumbers.last else { return }
         switch type {
-        case .prime: delegate?.loadMorePrimeNumbers(from: lastNumber)
-        case .fibanacci: delegate?.loadMoreFibanacciNumbers(from: lastNumber)
+        case .prime:
+            guard let lastNumber = primeNumbers.last else { return }
+            delegate?.loadMorePrimeNumbers(from: lastNumber)
+        case .fibanacci:
+            if fibanacciNumbers.count >= 2 {
+                let pair = (fibanacciNumbers[fibanacciNumbers.count - 1], fibanacciNumbers[fibanacciNumbers.count - 2])
+                delegate?.loadMoreFibanacciNumbers(from: pair)
+            }
         }
     }
 }

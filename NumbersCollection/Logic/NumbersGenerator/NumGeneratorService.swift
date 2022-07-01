@@ -13,7 +13,7 @@ final class NumGeneratorService {
     private init() {}
     
     // MARK: - Properties
-    var packageSize: Int = 60
+    var packageSize: Int = 30
     
     // MARK: - Private methods
     /**
@@ -24,31 +24,54 @@ final class NumGeneratorService {
      - warning: Сложность алгоритма O(Sqrt(n)/2)
      
      */
-    func isPrime(_ n: Int) -> Bool {
+    private func isPrime(_ n: Int) -> Bool {
         guard n >= 2     else { return false }
         guard n != 2     else { return true  }
         guard n % 2 != 0 else { return false }
         return !stride(from: 3, through: Int(sqrt(Double(n))), by: 2).contains { n % $0 == 0 }
     }
+    
+    /**
+     Данный метод позволяет получить следующее число фибоначчи после двух предыдущих, переденных в качестве пары целых чисел
+     
+     - parameter pair: Пара последних двух чисел из ряда фибоначчи
+     - returns: Следующее число в ряду
+     - warning: Сложность алгоритма O(1)
+     
+     */
+    private func fibonacciNextItem(from pair: (Int, Int)) -> Int {
+        if pair.0 <= Int.max - pair.1 {
+        return pair.0 + pair.1
+        } else {
+            return pair.1
+        }
+    }
 }
 
 extension NumGeneratorService: NumGeneratorInterface {
     
+    // O((Sqrt(n)/2)^2) -> O(n/4)
     func getPrimeNumbers(from initValue: Int) -> [Int] {
         var values = [Int]()
-        var checkingValue = initValue
+        var checkingValue = initValue + 1
         while values.count < packageSize {
             if isPrime(checkingValue) { values.append(checkingValue) }
-            checkingValue += 1
+            if checkingValue < Int.max { checkingValue += 1 }
         }
         return values
     }
     
-    func getFibanacciNumbers(from initValue: Int) -> [Int] {
-        var x = [Int]()
-        for i in 0...packageSize { x.append(Int.random(in: 0...100)) }
-        return x
-        
+    // O(n)
+    func getFibanacciNumbers(from initPair: (Int, Int)) -> [Int] {
+        var values = [Int]()
+        var fibPair = initPair
+        while values.count < packageSize {
+            let nextFibValue = fibonacciNextItem(from: fibPair)
+            let nextPair = (fibPair.1, nextFibValue)
+            values.append(nextFibValue)
+            fibPair = nextPair
+        }
+        return values
     }
     
     
