@@ -9,5 +9,10 @@ import Foundation
 
 protocol NumGeneratorInterface: AnyObject {
     
+    var packageSize: Int { get set }
+    
+    func getPrimeNumbers(from initValue: Int) -> [Int]
+    
+    func getFibanacciNumbers(from initValue: Int) -> [Int]
 }
 

@@ -7,18 +7,30 @@
 
 import UIKit
 
+protocol NumbersViewDelegate: AnyObject {
+    func didSelectSegment(_ segment: Any)
+}
+
 protocol NumbersViewProtocol: UIView {
+    var delegate: NumbersViewDelegate? { get set }
     
+    func showPrimeCollection()
+    func showFibanacciCollection()
 }
 
 final class NumbersView: UIView {
 
     // MARK: - Properties
+    weak var delegate: NumbersViewDelegate?
+    
+    private let segmentItems: [CollectionType]
+    
     // MARK: - Views
-    private let segmentedControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["Простые", "Фибоначи"])
+    private lazy var segmentedControl: UISegmentedControl = {
+        let control = UISegmentedControl(items: segmentItems.map { $0.rawValue })
         control.translatesAutoresizingMaskIntoConstraints = false
         control.selectedSegmentIndex = 0
+        control.addTarget(self, action: #selector(handleSegment(_:)), for: .valueChanged)
         return control
     }()
     
@@ -28,8 +40,15 @@ final class NumbersView: UIView {
         return collection
     }()
     
+    private lazy var fibCollection: NumbersCollection = {
+        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collection.translatesAutoresizingMaskIntoConstraints = false
+        return collection
+    }()
+    
     // MARK: - Init
-    override init(frame: CGRect) {
+    init(frame: CGRect, segmentItems: [CollectionType]) {
+        self.segmentItems = segmentItems
         super.init(frame: frame)
         setupView()
     }
@@ -39,7 +58,10 @@ final class NumbersView: UIView {
     }
     // MARK: - Private methods
     private func setupView() {
-        
+        numCollection.controlDelegate = self
+        fibCollection.controlDelegate = self
+        fibCollection.isUserInteractionEnabled = true
+        fibCollection.alpha = 0
         
         setupSubviews()
     }
@@ -47,6 +69,7 @@ final class NumbersView: UIView {
     private func setupSubviews() {
         addSubview(segmentedControl)
         addSubview(numCollection)
+        addSubview(fibCollection)
         setupConstranits()
     }
     
@@ -60,18 +83,48 @@ final class NumbersView: UIView {
         numCollection.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         numCollection.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         numCollection.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        
+        fibCollection.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor).isActive = true
+        fibCollection.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        fibCollection.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        fibCollection.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+    }
+    
+    // MARK: - Selectors
+    @objc
+    private func handleSegment(_ sender: UISegmentedControl) {
+        delegate?.didSelectSegment(segmentItems[sender.selectedSegmentIndex])
     }
 }
 
 // MARK: - Protocol execution
 extension NumbersView: NumbersViewProtocol {
+    func showPrimeCollection() {
+        fibCollection.showSelf(false, animated: true) { [weak self] state in
+            guard let self = self else { return }
+            self.numCollection.showSelf(true, animated: true, handler: nil)
+        }
+    }
     
+    func showFibanacciCollection() {
+        numCollection.showSelf(false, animated: true) { [weak self] state in
+            guard let self = self else { return }
+            self.fibCollection.showSelf(true, animated: true, handler: nil)
+        }
+    }
+}
+
+extension NumbersView: NumbersCollectionDelegate {
+    func didDisplayPaginatorDetectorCell() {
+        print("Detector displayed")
+    }
 }
 
 // MARK: - Constants
 extension NumbersView {
     struct Constants {
         static var backgroundColor: UIColor { .lightGray }
+        static var defaultAnimationDuration: CGFloat { 0.3 }
     }
 }
 

@@ -18,6 +18,7 @@
 		412CC245286EF6600094749C /* NumbersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC244286EF6600094749C /* NumbersController.swift */; };
 		412CC248286EFFC60094749C /* NumbersCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC247286EFFC60094749C /* NumbersCollection.swift */; };
 		412CC24A286F01630094749C /* NumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC249286F01630094749C /* NumCell.swift */; };
+		412CC250286F17DC0094749C /* NumbersEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC24F286F17DC0094749C /* NumbersEntities.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		412CC244286EF6600094749C /* NumbersController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersController.swift; sourceTree = "<group>"; };
 		412CC247286EFFC60094749C /* NumbersCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersCollection.swift; sourceTree = "<group>"; };
 		412CC249286F01630094749C /* NumCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumCell.swift; sourceTree = "<group>"; };
+		412CC24F286F17DC0094749C /* NumbersEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersEntities.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				412CC246286EFFB70094749C /* Subviews */,
 				412CC242286EF6580094749C /* NumbersView.swift */,
 				412CC244286EF6600094749C /* NumbersController.swift */,
+				412CC24F286F17DC0094749C /* NumbersEntities.swift */,
 			);
 			path = MainScreen;
 			sourceTree = "<group>";
@@ -205,6 +208,7 @@
 				412CC245286EF6600094749C /* NumbersController.swift in Sources */,
 				412CC23F286EF60D0094749C /* NumGeneratorService.swift in Sources */,
 				412CC243286EF6580094749C /* NumbersView.swift in Sources */,
+				412CC250286F17DC0094749C /* NumbersEntities.swift in Sources */,
 				412CC248286EFFC60094749C /* NumbersCollection.swift in Sources */,
 				412CC224286EF5240094749C /* AppDelegate.swift in Sources */,
 				412CC241286EF6180094749C /* NumGeneratorInterface.swift in Sources */,

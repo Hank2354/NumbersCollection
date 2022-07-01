@@ -8,19 +8,27 @@
 import Foundation
 import UIKit
 
+protocol NumbersCollectionDelegate: AnyObject {
+    func didDisplayPaginatorDetectorCell()
+}
+
 protocol NumbersCollectionProtocol: UICollectionView {
+    var controlDelegate: NumbersCollectionDelegate? { get set }
     
+    func showSelf(_ isShow: Bool, animated: Bool, handler: ((Bool) -> ())?)
 }
 
 final class NumbersCollection: UICollectionView {
     // MARK: - Properties
+    weak var controlDelegate: NumbersCollectionDelegate?
+    
     private var numbers = [Int]()
     
     // MARK: - Init
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
         configureCollection()
-        numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+        numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
         reloadData()
     }
     
@@ -30,8 +38,8 @@ final class NumbersCollection: UICollectionView {
     
     // MARK: - Private methods
     private func configureCollection() {
-        backgroundColor = .clear
-        register(NumCell.self, forCellWithReuseIdentifier: "numCell")
+        backgroundColor = Constants.backgroundColor
+        register(NumCell.self, forCellWithReuseIdentifier: Constants.cellID)
         dataSource = self
         delegate = self
         if let layout = collectionViewLayout as? UICollectionViewFlowLayout {
@@ -45,7 +53,18 @@ final class NumbersCollection: UICollectionView {
 
 // MARK: - Protocol execution
 extension NumbersCollection: NumbersCollectionProtocol {
-    
+    func showSelf(_ isShow: Bool, animated: Bool, handler: ((Bool) -> ())?) {
+        if animated {
+            UIView.animate(withDuration: Constants.defaultAnimationDuration) { [weak self] in
+                guard let self = self else { return }
+                self.alpha = isShow ? 1 : 0
+            } completion: { [weak self] state in
+                guard let self = self else { return }
+                self.isUserInteractionEnabled = isShow
+                handler?(state)
+            }
+        }
+    }
 }
 
 // MARK: - Delegate
@@ -56,7 +75,7 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "numCell", for: indexPath) as? NumCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? NumCell
         guard let cell = cell else { return UICollectionViewCell() }
         
         let isEvenIndex = indexPath.row % 2 == 0
@@ -79,6 +98,10 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
         return CGSize(width:widthPerItem, height:100)
     }
     
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if indexPath.row + 1 == numbers.count - Constants.paginationDetectorPreset { controlDelegate?.didDisplayPaginatorDetectorCell() }
+    }
+    
 }
 
 // MARK: - Constants
@@ -89,5 +112,12 @@ extension NumbersCollection {
         
         static var lightCellColor: UIColor { .lightGray }
         static var darkCellColor: UIColor { .darkGray }
+        
+        static var backgroundColor: UIColor { .clear }
+        
+        static var cellID: String { .init(describing: NumCell.self) }
+        
+        static var paginationDetectorPreset: Int { 6 }
+        static var defaultAnimationDuration: CGFloat { 0.3 }
     }
 }
