@@ -9,5 +9,5 @@ import Foundation
 
 enum CollectionType: String {
     case prime = "Простые"
-    case fibanacci = "Фибаначчи"
+    case fibonacci = "Фибоначчи"
 }

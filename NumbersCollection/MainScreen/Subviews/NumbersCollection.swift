@@ -17,7 +17,6 @@ protocol NumbersCollectionProtocol: UICollectionView {
     var collectionType: CollectionType { get }
     
     func showSelf(_ isShow: Bool, animated: Bool, handler: ((Bool) -> ())?)
-    
     func insertNewNumbers(_ numbers: [Int])
 }
 
@@ -69,6 +68,7 @@ extension NumbersCollection: NumbersCollectionProtocol {
     }
     
     func insertNewNumbers(_ numbers: [Int]) {
+        // Обновляем интерфейс асинхронно в главном потоке
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.numbers.append(contentsOf: numbers)
@@ -88,6 +88,9 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? NumCell
         guard let cell = cell else { return UICollectionViewCell() }
         
+        // Получаем значения четной строки, и четного индекса в строке. В каждой строке левый элемент будет четным, и нечетным в правой
+        // Для четных строк - левый элемент белый, правый - черный
+        // Для нечетных строк - наоборот
         let isEvenIndex = indexPath.row % 2 == 0
         let isEvenRow = indexPath.row / 2 % 2 == 0
         
@@ -105,7 +108,7 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
         let lay = collectionViewLayout as! UICollectionViewFlowLayout
         let widthPerItem = collectionView.frame.width / 2 - lay.minimumInteritemSpacing
         
-        return CGSize(width:widthPerItem, height:100)
+        return CGSize(width: widthPerItem, height: Constants.cellHeight)
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -121,6 +124,7 @@ extension NumbersCollection {
     struct Constants {
         static var minimumLineSpacing: CGFloat { 0 }
         static var minimumInteritemSpacing: CGFloat { 0 }
+        static var cellHeight: CGFloat { 100 }
         
         static var lightCellColor: UIColor { .lightGray }
         static var darkCellColor: UIColor { .darkGray }

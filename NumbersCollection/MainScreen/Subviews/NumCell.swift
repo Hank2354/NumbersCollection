@@ -10,6 +10,7 @@ import UIKit
 
 final class NumCell: UICollectionViewCell {
     
+    // MARK: - Views
     private let numLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -17,6 +18,7 @@ final class NumCell: UICollectionViewCell {
         return label
     }()
     
+    // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupCell()
@@ -26,10 +28,12 @@ final class NumCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Open methods
     func setNum(_ value: Int) {
         numLabel.text = "\(value)"
     }
     
+    // MARK: - Private methods
     private func setupCell() {
         setupSubviews()
     }

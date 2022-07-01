@@ -9,7 +9,6 @@ import UIKit
 
 protocol NumbersViewDelegate: AnyObject {
     func didSelectSegment(_ segment: Any)
-    
     func loadMorePrimeNumbers(from lastNumber: Int)
     func loadMoreFibanacciNumbers(from lastPair: (Int, Int))
 }
@@ -19,7 +18,6 @@ protocol NumbersViewProtocol: UIView {
     
     func showPrimeCollection()
     func showFibanacciCollection()
-    
     func insertNewNumbers(_ numbers: [Int], into collection: CollectionType)
 }
 
@@ -29,7 +27,6 @@ final class NumbersView: UIView {
     weak var delegate: NumbersViewDelegate?
     
     private let segmentItems: [CollectionType]
-    
     private var primeNumbers = [Int]()
     private var fibanacciNumbers = [Int]()
     
@@ -42,14 +39,14 @@ final class NumbersView: UIView {
         return control
     }()
     
-    private lazy var numCollection: NumbersCollection = {
+    private lazy var primeCollection: NumbersCollection = {
         let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout(), type: .prime)
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
     
     private lazy var fibCollection: NumbersCollection = {
-        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout(), type: .fibanacci)
+        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout(), type: .fibonacci)
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
@@ -67,8 +64,9 @@ final class NumbersView: UIView {
     
     // MARK: - Private methods
     private func setupView() {
-        numCollection.controlDelegate = self
+        primeCollection.controlDelegate = self
         fibCollection.controlDelegate = self
+        
         fibCollection.isUserInteractionEnabled = true
         fibCollection.alpha = 0
         
@@ -77,23 +75,23 @@ final class NumbersView: UIView {
     
     private func setupSubviews() {
         addSubview(segmentedControl)
-        addSubview(numCollection)
+        addSubview(primeCollection)
         addSubview(fibCollection)
         setupConstranits()
     }
     
     private func setupConstranits() {
-        segmentedControl.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        segmentedControl.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        segmentedControl.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        segmentedControl.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        segmentedControl.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
+        segmentedControl.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.segmentedHorizontalOffset).isActive = true
+        segmentedControl.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.segmentedHorizontalOffset).isActive = true
+        segmentedControl.heightAnchor.constraint(equalToConstant: Constants.segmentedHeight).isActive = true
         
-        numCollection.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor).isActive = true
-        numCollection.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        numCollection.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        numCollection.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        primeCollection.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: Constants.collectionTopInset).isActive = true
+        primeCollection.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        primeCollection.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        primeCollection.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
-        fibCollection.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor).isActive = true
+        fibCollection.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: Constants.collectionTopInset).isActive = true
         fibCollection.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         fibCollection.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         fibCollection.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
@@ -111,12 +109,12 @@ extension NumbersView: NumbersViewProtocol {
     func showPrimeCollection() {
         fibCollection.showSelf(false, animated: true) { [weak self] state in
             guard let self = self else { return }
-            self.numCollection.showSelf(true, animated: true, handler: nil)
+            self.primeCollection.showSelf(true, animated: true, handler: nil)
         }
     }
     
     func showFibanacciCollection() {
-        numCollection.showSelf(false, animated: true) { [weak self] state in
+        primeCollection.showSelf(false, animated: true) { [weak self] state in
             guard let self = self else { return }
             self.fibCollection.showSelf(true, animated: true, handler: nil)
         }
@@ -124,8 +122,8 @@ extension NumbersView: NumbersViewProtocol {
     
     func insertNewNumbers(_ numbers: [Int], into collection: CollectionType) {
         switch collection {
-        case .prime: numCollection.insertNewNumbers(numbers); primeNumbers.append(contentsOf: numbers)
-        case .fibanacci: fibCollection.insertNewNumbers(numbers); fibanacciNumbers.append(contentsOf: numbers)
+        case .prime: primeCollection.insertNewNumbers(numbers); primeNumbers.append(contentsOf: numbers)
+        case .fibonacci: fibCollection.insertNewNumbers(numbers); fibanacciNumbers.append(contentsOf: numbers)
         }
     }
 }
@@ -137,7 +135,7 @@ extension NumbersView: NumbersCollectionDelegate {
         case .prime:
             guard let lastNumber = primeNumbers.last else { return }
             delegate?.loadMorePrimeNumbers(from: lastNumber)
-        case .fibanacci:
+        case .fibonacci:
             if fibanacciNumbers.count >= 2 {
                 let pair = (fibanacciNumbers[fibanacciNumbers.count - 1], fibanacciNumbers[fibanacciNumbers.count - 2])
                 delegate?.loadMoreFibanacciNumbers(from: pair)
@@ -150,6 +148,9 @@ extension NumbersView: NumbersCollectionDelegate {
 extension NumbersView {
     struct Constants {
         static var backgroundColor: UIColor { .lightGray }
+        static var segmentedHeight: CGFloat { 50 }
+        static var segmentedHorizontalOffset: CGFloat { 16 }
+        static var collectionTopInset: CGFloat { 8 }
     }
 }
 
