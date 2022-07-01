@@ -14,15 +14,23 @@ protocol NumbersControllerProtocol: UIViewController {
 final class NumbersController: UIViewController {
 
     // MARK: - Properties
+    private let contentView: NumbersViewProtocol = NumbersView()
     
     // MARK: - Lifecycle
+    override func loadView() {
+        view = contentView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .red
+        view.backgroundColor = .lightGray
+        configureController()
     }
     
     // MARK: - Private methods
-
+    private func configureController() {
+        title = ConfigConstants.mainTitle
+    }
 }
 
 // MARK: - Protocol execution
