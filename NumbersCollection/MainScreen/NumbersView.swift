@@ -28,6 +28,7 @@ final class NumbersView: UIView {
     private let segmentItems: [CollectionType]
     private var primeNumbers = [Int]()
     private var fibanacciNumbers = [Int]()
+    private var selectedCollection: CollectionType
     
     // MARK: - Views
     private lazy var segmentedControl: UISegmentedControl = {
@@ -38,20 +39,25 @@ final class NumbersView: UIView {
     }()
     
     private lazy var primeCollection: NumbersCollection = {
-        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout(), type: .prime)
+        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.alpha = 0
+        collection.isUserInteractionEnabled = false
         return collection
     }()
     
     private lazy var fibCollection: NumbersCollection = {
-        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout(), type: .fibonacci)
+        let collection = NumbersCollection(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.alpha = 0
+        collection.isUserInteractionEnabled = true
         return collection
     }()
     
     // MARK: - Init
     init(frame: CGRect, segmentItems: [CollectionType]) {
         self.segmentItems = segmentItems
+        self.selectedCollection = segmentItems.first ?? .prime
         super.init(frame: frame)
         setupView()
     }
@@ -64,9 +70,6 @@ final class NumbersView: UIView {
     private func setupView() {
         primeCollection.controlDelegate = self
         fibCollection.controlDelegate = self
-        
-        fibCollection.isUserInteractionEnabled = true
-        fibCollection.alpha = 0
         
         setupSubviews()
     }
@@ -107,10 +110,17 @@ extension NumbersView: NumbersViewProtocol {
     func configure(with segmentIndex: Int) {
         segmentedControl.selectedSegmentIndex = segmentIndex
         guard !segmentItems.isEmpty else { return }
-        delegate?.didSelectSegment(segmentItems[segmentIndex])
+        let startCollectionType = segmentItems[segmentIndex]
+        delegate?.didSelectSegment(startCollectionType)
+        
+        switch startCollectionType {
+        case .prime: primeCollection.alpha = 1; primeCollection.isUserInteractionEnabled = true
+        case .fibonacci: fibCollection.alpha = 1; fibCollection.isUserInteractionEnabled = true
+        }
     }
     
     func showCollection(_ type: CollectionType) {
+        selectedCollection = type
         switch type {
         case .prime:
             fibCollection.showSelf(false, animated: true) { [weak self] state in
@@ -135,8 +145,8 @@ extension NumbersView: NumbersViewProtocol {
 
 // MARK: - Collection delegate execution
 extension NumbersView: NumbersCollectionDelegate {
-    func didDisplayPaginatorDetectorCell(_ type: CollectionType) {
-        switch type {
+    func didDisplayPaginatorDetectorCell() {
+        switch selectedCollection {
         case .prime:
             guard let lastNumber = primeNumbers.last else { return }
             delegate?.loadMoreNumbers(.prime(lastNumber))
@@ -147,9 +157,9 @@ extension NumbersView: NumbersCollectionDelegate {
             }
         }
     }
-    
-    func didAppear(_ type: CollectionType) {
-        switch type {
+
+    func didAppear() {
+        switch selectedCollection {
         case .prime:
             if primeNumbers.isEmpty { delegate?.loadMoreNumbers(.prime(0)) }
         case .fibonacci:

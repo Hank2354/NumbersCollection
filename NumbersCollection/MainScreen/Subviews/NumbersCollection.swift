@@ -9,13 +9,12 @@ import Foundation
 import UIKit
 
 protocol NumbersCollectionDelegate: AnyObject {
-    func didDisplayPaginatorDetectorCell(_ type: CollectionType)
-    func didAppear(_ type: CollectionType)
+    func didDisplayPaginatorDetectorCell()
+    func didAppear()
 }
 
 protocol NumbersCollectionProtocol: UICollectionView {
     var controlDelegate: NumbersCollectionDelegate? { get set }
-    var collectionType: CollectionType { get }
     
     func showSelf(_ isShow: Bool, animated: Bool, handler: ((Bool) -> ())?)
     func insertNewNumbers(_ numbers: [Int])
@@ -24,12 +23,10 @@ protocol NumbersCollectionProtocol: UICollectionView {
 final class NumbersCollection: UICollectionView {
     // MARK: - Properties
     weak var controlDelegate: NumbersCollectionDelegate?
-    internal var collectionType: CollectionType
     private var numbers = [Int]()
     
     // MARK: - Init
-    init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout, type: CollectionType) {
-        self.collectionType = type
+    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
         configureCollection()
     }
@@ -79,7 +76,7 @@ extension NumbersCollection: NumbersCollectionProtocol {
                 guard let self = self else { return }
                 self.isUserInteractionEnabled = isShow
                 handler?(state)
-                if isShow { self.controlDelegate?.didAppear(self.collectionType) }
+                if isShow { self.controlDelegate?.didAppear() }
             }
         }
     }
@@ -122,7 +119,7 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if indexPath.row + 1 == numbers.count - Constants.paginationDetectorPreset {
-            controlDelegate?.didDisplayPaginatorDetectorCell(collectionType)
+            controlDelegate?.didDisplayPaginatorDetectorCell()
         }
     }
     
