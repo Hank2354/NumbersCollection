@@ -50,6 +50,21 @@ final class NumbersCollection: UICollectionView {
         }
         
     }
+    
+    /**
+     Определить цвет ячейки по указанному индексу используя шахматный стиль в 2 колонки
+     Получаем остаток от деления на указанного индекса на 4, и будем получать повторяющуюся последовательность
+     0, 1, 2, 3, 0, 1, 2 ......
+     Каждый два идущих подряд индекса, начиная с 1 должны быть одного цвета, возвращаем true если индекс 1 или 2, тогда получим
+     шахматный порядок, начиная со светлой ячейки. 
+     
+     - parameter index: IndexPath целевой ячейки.
+     - returns: Возвращает true для белой ячейки
+     */
+    private func isWhiteCell(index: IndexPath) -> Bool {
+        let mod = index.item % 4
+        return (mod == 1 || mod == 2)
+    }
 }
 
 // MARK: - Protocol execution
@@ -88,16 +103,8 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? NumCell
         guard let cell = cell else { return UICollectionViewCell() }
         
-        // Получаем значения четной строки, и четного индекса в строке. В каждой строке левый элемент будет четным, и нечетным в правой
-        // Для четных строк - левый элемент белый, правый - черный
-        // Для нечетных строк - наоборот
-        let isEvenIndex = indexPath.row % 2 == 0
-        let isEvenRow = indexPath.row / 2 % 2 == 0
-        
-        if isEvenRow && isEvenIndex { cell.backgroundColor = Constants.lightCellColor }
-        else if isEvenRow && !isEvenIndex { cell.backgroundColor = Constants.darkCellColor }
-        else if !isEvenRow && isEvenIndex { cell.backgroundColor = Constants.darkCellColor }
-        else { cell.backgroundColor = Constants.lightCellColor }
+        cell.backgroundColor = isWhiteCell(index: indexPath) ?
+        Constants.darkCellColor : Constants.lightCellColor
         
         cell.setNum(numbers[indexPath.row])
         return cell
