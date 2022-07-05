@@ -35,19 +35,17 @@ final class NumFibonacciGenerator {
 extension NumFibonacciGenerator: NumGeneratorInterface {
     
     // O(n)
-    func getNumbers(from initValue: NumGeneratorInitValue) -> [Int] {
-        if case let .fibonacci(pair) = initValue {
-            var values = [Int]()
-            if pair.0 == 0 || pair.1 == 1 { values.append(contentsOf: [pair.0, pair.1]) }
-            var fibPair = pair
-            while values.count < packageSize {
-                let nextFibValue = fibonacciNextItem(from: fibPair)
-                let nextPair = (fibPair.1, nextFibValue)
-                values.append(nextFibValue)
-                fibPair = nextPair
-            }
-            return values
-        } else { return [] }
+    func getNumbers(from sequence: [Int]) -> [Int] {
+        var values = [Int]()
+        if sequence.count < 2 { values.append(contentsOf: [0, 1]) }
+        var fibPair = sequence.count >= 2 ? (sequence[sequence.count - 2], sequence[sequence.count - 1]) : (0, 1)
+        while values.count < packageSize {
+            let nextFibValue = fibonacciNextItem(from: fibPair)
+            let nextPair = (fibPair.1, nextFibValue)
+            values.append(nextFibValue)
+            fibPair = nextPair
+        }
+        return values
     }
 }
 

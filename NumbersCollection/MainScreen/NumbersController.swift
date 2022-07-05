@@ -9,7 +9,8 @@ import UIKit
 
 protocol NumbersControllerProtocol: UIViewController {
     var selectedSegment: SegmentItem { get set }
-    var numbers: [Int] { get }
+    var numbers: [Int] { get set }
+    var generator: NumGeneratorInterface { get }
 }
 
 final class NumbersController: UIViewController {
@@ -47,9 +48,24 @@ final class NumbersController: UIViewController {
 // MARK: - Protocol execution
 extension NumbersController: NumbersControllerProtocol {
     var numbers: [Int] {
+        get {
+            switch selectedSegment {
+            case .prime:     return primeNumbers
+            case .fibonacci: return fibanacciNumbers
+            }
+        }
+        set {
+            switch selectedSegment {
+            case .prime:     primeNumbers = newValue
+            case .fibonacci: fibanacciNumbers = newValue
+            }
+        }
+    }
+    
+    var generator: NumGeneratorInterface {
         switch selectedSegment {
-        case .prime:     return primeNumbers
-        case .fibonacci: return fibanacciNumbers
+        case .prime: return NumPrimeGenerator.shared
+        case .fibonacci: return NumFibonacciGenerator.shared
         }
     }
 }
@@ -68,21 +84,8 @@ extension NumbersController: NumbersViewDelegate {
         let utilityQueue = DispatchQueue.global(qos: .utility)
         utilityQueue.async { [weak self] in
             guard let self = self else { return }
-            switch self.selectedSegment {
-            case .prime:
-                self.primeNumbers.append(contentsOf: NumPrimeGenerator.shared.getNumbers(from: .prime(self.primeNumbers.last ?? 0)))
-                self.contentView.display(self.primeNumbers, animated: false)
-            case .fibonacci:
-                if self.fibanacciNumbers.count >= 2 {
-                    let pair = (self.fibanacciNumbers[self.fibanacciNumbers.count - 2],
-                                self.fibanacciNumbers[self.fibanacciNumbers.count - 1])
-                    self.fibanacciNumbers.append(contentsOf: NumFibonacciGenerator.shared.getNumbers(from: .fibonacci(pair.0, pair.1)))
-                    self.contentView.display(self.fibanacciNumbers, animated: false)
-                } else {
-                    self.fibanacciNumbers.append(contentsOf: NumFibonacciGenerator.shared.getNumbers(from: .fibonacci(0, 1)))
-                    self.contentView.display(self.fibanacciNumbers, animated: false)
-                }
-            }
+            self.numbers.append(contentsOf: self.generator.getNumbers(from: self.numbers))
+            self.contentView.display(self.numbers, animated: false)
         }
     }
 }
