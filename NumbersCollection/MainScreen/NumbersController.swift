@@ -8,14 +8,17 @@
 import UIKit
 
 protocol NumbersControllerProtocol: UIViewController {
-    var selectedType: CollectionType { get set }
+    var selectedSegment: SegmentItem { get set }
+    var numbers: [Int] { get }
 }
 
 final class NumbersController: UIViewController {
 
     // MARK: - Properties
+    internal var selectedSegment: SegmentItem = ConfigConstants.startSegment
     private let contentView: NumbersViewProtocol = NumbersView(frame: .zero, segmentItems: ConfigConstants.segmentedItems)
-    internal var selectedType: CollectionType = ConfigConstants.startSegment
+    private var primeNumbers = [Int]()
+    private var fibanacciNumbers = [Int]()
     
     // MARK: - Lifecycle
     override func loadView() {
@@ -36,32 +39,49 @@ final class NumbersController: UIViewController {
     }
     
     private func startLogic() {
-        contentView.configure(with: ConfigConstants.segmentedItems.firstIndex(of: selectedType) ??
-                              ConfigConstants.segmentedItems.startIndex)
+        contentView.configure(with: ConfigConstants.segmentedItems.firstIndex(of: selectedSegment) ??
+                                    ConfigConstants.segmentedItems.startIndex)
     }
 }
 
 // MARK: - Protocol execution
-extension NumbersController: NumbersControllerProtocol {}
+extension NumbersController: NumbersControllerProtocol {
+    var numbers: [Int] {
+        switch selectedSegment {
+        case .prime:     return primeNumbers
+        case .fibonacci: return fibanacciNumbers
+        }
+    }
+}
 
 // MARK: - View delegate execution
 extension NumbersController: NumbersViewDelegate {
+    
     func didSelectSegment(_ segment: Any) {
         // Реагируем на выбор нового сегмента
-        guard let segment = segment as? CollectionType else { return }
-        selectedType = segment
-        contentView.showCollection(selectedType)
+        guard let segment = segment as? SegmentItem else { return }
+        selectedSegment = segment
+        contentView.display(numbers, animated: true)
     }
     
-    func loadMoreNumbers(_ initValues: NumGeneratorInitValue) {
+    func didDisplayDetector() {
         let utilityQueue = DispatchQueue.global(qos: .utility)
         utilityQueue.async { [weak self] in
             guard let self = self else { return }
-            switch self.selectedType {
+            switch self.selectedSegment {
             case .prime:
-                self.contentView.insertNewNumbers(NumPrimeGenerator.shared.getNumbers(from: initValues), into: self.selectedType)
+                self.primeNumbers.append(contentsOf: NumPrimeGenerator.shared.getNumbers(from: .prime(self.primeNumbers.last ?? 0)))
+                self.contentView.display(self.primeNumbers, animated: false)
             case .fibonacci:
-                self.contentView.insertNewNumbers(NumFibonacciGenerator.shared.getNumbers(from: initValues), into: self.selectedType)
+                if self.fibanacciNumbers.count >= 2 {
+                    let pair = (self.fibanacciNumbers[self.fibanacciNumbers.count - 2],
+                                self.fibanacciNumbers[self.fibanacciNumbers.count - 1])
+                    self.fibanacciNumbers.append(contentsOf: NumFibonacciGenerator.shared.getNumbers(from: .fibonacci(pair.0, pair.1)))
+                    self.contentView.display(self.fibanacciNumbers, animated: false)
+                } else {
+                    self.fibanacciNumbers.append(contentsOf: NumFibonacciGenerator.shared.getNumbers(from: .fibonacci(0, 1)))
+                    self.contentView.display(self.fibanacciNumbers, animated: false)
+                }
             }
         }
     }
@@ -72,8 +92,8 @@ extension NumbersController {
     struct ConfigConstants {
         static var mainTitle: String = "Числовой контроллер"
         static var viewBackgroundColor: UIColor { .systemGray3 }
-        static var segmentedItems: [CollectionType] { [.prime, .fibonacci] }
-        static var startSegment: CollectionType { segmentedItems[segmentedItems.startIndex] }
+        static var segmentedItems: [SegmentItem] { [.prime, .fibonacci] }
+        static var startSegment: SegmentItem { segmentedItems[segmentedItems.startIndex] }
         static var defaultPacketSize: Int { 30 }
     }
 }
