@@ -8,14 +8,18 @@
 import UIKit
 
 protocol NumbersControllerProtocol: UIViewController {
-    var selectedType: CollectionType { get set }
+    var selectedSegment: SegmentItem { get set }
+    var numbers: [Int] { get set }
+    var generator: NumGeneratorInterface { get }
 }
 
 final class NumbersController: UIViewController {
 
     // MARK: - Properties
+    internal var selectedSegment: SegmentItem = ConfigConstants.startSegment
     private let contentView: NumbersViewProtocol = NumbersView(frame: .zero, segmentItems: ConfigConstants.segmentedItems)
-    internal var selectedType: CollectionType = ConfigConstants.startSegment
+    private var primeNumbers = [Int]()
+    private var fibanacciNumbers = [Int]()
     
     // MARK: - Lifecycle
     override func loadView() {
@@ -36,33 +40,52 @@ final class NumbersController: UIViewController {
     }
     
     private func startLogic() {
-        contentView.configure(with: ConfigConstants.segmentedItems.firstIndex(of: selectedType) ??
-                              ConfigConstants.segmentedItems.startIndex)
+        contentView.configure(with: ConfigConstants.segmentedItems.firstIndex(of: selectedSegment) ??
+                                    ConfigConstants.segmentedItems.startIndex)
     }
 }
 
 // MARK: - Protocol execution
-extension NumbersController: NumbersControllerProtocol {}
+extension NumbersController: NumbersControllerProtocol {
+    var numbers: [Int] {
+        get {
+            switch selectedSegment {
+            case .prime:     return primeNumbers
+            case .fibonacci: return fibanacciNumbers
+            }
+        }
+        set {
+            switch selectedSegment {
+            case .prime:     primeNumbers = newValue
+            case .fibonacci: fibanacciNumbers = newValue
+            }
+        }
+    }
+    
+    var generator: NumGeneratorInterface {
+        switch selectedSegment {
+        case .prime: return NumPrimeGenerator.shared
+        case .fibonacci: return NumFibonacciGenerator.shared
+        }
+    }
+}
 
 // MARK: - View delegate execution
 extension NumbersController: NumbersViewDelegate {
+    
     func didSelectSegment(_ segment: Any) {
         // Реагируем на выбор нового сегмента
-        guard let segment = segment as? CollectionType else { return }
-        selectedType = segment
-        contentView.showCollection(selectedType)
+        guard let segment = segment as? SegmentItem else { return }
+        selectedSegment = segment
+        contentView.display(numbers, animated: true)
     }
     
-    func loadMoreNumbers(_ initValues: NumGeneratorInitValue) {
+    func didDisplayDetector() {
         let utilityQueue = DispatchQueue.global(qos: .utility)
         utilityQueue.async { [weak self] in
             guard let self = self else { return }
-            switch self.selectedType {
-            case .prime:
-                self.contentView.insertNewNumbers(NumPrimeGenerator.shared.getNumbers(from: initValues), into: self.selectedType)
-            case .fibonacci:
-                self.contentView.insertNewNumbers(NumFibonacciGenerator.shared.getNumbers(from: initValues), into: self.selectedType)
-            }
+            self.numbers.append(contentsOf: self.generator.getNumbers(from: self.numbers))
+            self.contentView.display(self.numbers, animated: false)
         }
     }
 }
@@ -72,8 +95,8 @@ extension NumbersController {
     struct ConfigConstants {
         static var mainTitle: String = "Числовой контроллер"
         static var viewBackgroundColor: UIColor { .systemGray3 }
-        static var segmentedItems: [CollectionType] { [.prime, .fibonacci] }
-        static var startSegment: CollectionType { segmentedItems[segmentedItems.startIndex] }
+        static var segmentedItems: [SegmentItem] { [.prime, .fibonacci] }
+        static var startSegment: SegmentItem { segmentedItems[segmentedItems.startIndex] }
         static var defaultPacketSize: Int { 30 }
     }
 }

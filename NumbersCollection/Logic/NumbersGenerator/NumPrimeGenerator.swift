@@ -35,15 +35,13 @@ final class NumPrimeGenerator {
 extension NumPrimeGenerator: NumGeneratorInterface {
     
     // O((Sqrt(n)/2)^2) -> O(n/4)
-    func getNumbers(from initValue: NumGeneratorInitValue) -> [Int] {
-        if case let .prime(value) = initValue {
-            var values = [Int]()
-            var checkingValue = value + 1
-            while values.count < packageSize {
-                if isPrime(checkingValue) { values.append(checkingValue) }
-                if checkingValue < Int.max { checkingValue += 1 }
-            }
-            return values
-        } else { return [] }
+    func getNumbers(from sequence: [Int]) -> [Int] {
+        var values = [Int]()
+        var checkingValue = sequence.isEmpty ? 1 : sequence.last! + 1
+        while values.count < packageSize {
+            if isPrime(checkingValue) { values.append(checkingValue) }
+            if checkingValue < Int.max { checkingValue += 1 }
+        }
+        return values
     }
 }

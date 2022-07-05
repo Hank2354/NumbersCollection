@@ -10,14 +10,13 @@ import UIKit
 
 protocol NumbersCollectionDelegate: AnyObject {
     func didDisplayPaginatorDetectorCell()
-    func didAppear()
 }
 
 protocol NumbersCollectionProtocol: UICollectionView {
     var controlDelegate: NumbersCollectionDelegate? { get set }
     
     func showSelf(_ isShow: Bool, animated: Bool, handler: ((Bool) -> ())?)
-    func insertNewNumbers(_ numbers: [Int])
+    func setNumbers(_ numbers: [Int])
 }
 
 final class NumbersCollection: UICollectionView {
@@ -76,17 +75,22 @@ extension NumbersCollection: NumbersCollectionProtocol {
             } completion: { [weak self] state in
                 guard let self = self else { return }
                 self.isUserInteractionEnabled = isShow
+                if !self.numbers.isEmpty, !isShow { self.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: false) }
                 handler?(state)
-                if isShow { self.controlDelegate?.didAppear() }
             }
+        } else {
+            self.alpha = isShow ? 1 : 0
+            self.isUserInteractionEnabled = isShow
+            handler?(true)
         }
     }
     
-    func insertNewNumbers(_ numbers: [Int]) {
+    func setNumbers(_ numbers: [Int]) {
+        if numbers.isEmpty { controlDelegate?.didDisplayPaginatorDetectorCell(); return }
         // Обновляем интерфейс асинхронно в главном потоке
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.numbers.append(contentsOf: numbers)
+            self.numbers = numbers
             self.reloadData()
         }
     }
