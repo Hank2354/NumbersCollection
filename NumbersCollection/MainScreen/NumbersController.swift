@@ -51,10 +51,7 @@ extension NumbersController: NumbersViewDelegate {
         // Реагируем на выбор нового сегмента
         guard let segment = segment as? CollectionType else { return }
         selectedType = segment
-        switch segment {
-        case .prime: contentView.showPrimeCollection()
-        case .fibonacci: contentView.showFibanacciCollection()
-        }
+        contentView.showCollection(selectedType)
     }
     
     func loadMorePrimeNumbers(from lastNumber: Int) {

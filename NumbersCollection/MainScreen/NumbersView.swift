@@ -17,8 +17,7 @@ protocol NumbersViewProtocol: UIView {
     var delegate: NumbersViewDelegate? { get set }
     
     func configure(with segmentIndex: Int)
-    func showPrimeCollection()
-    func showFibanacciCollection()
+    func showCollection(_ type: CollectionType)
     func insertNewNumbers(_ numbers: [Int], into collection: CollectionType)
 }
 
@@ -112,17 +111,18 @@ extension NumbersView: NumbersViewProtocol {
         delegate?.didSelectSegment(segmentItems[segmentIndex])
     }
     
-    func showPrimeCollection() {
-        fibCollection.showSelf(false, animated: true) { [weak self] state in
-            guard let self = self else { return }
-            self.primeCollection.showSelf(true, animated: true, handler: nil)
-        }
-    }
-    
-    func showFibanacciCollection() {
-        primeCollection.showSelf(false, animated: true) { [weak self] state in
-            guard let self = self else { return }
-            self.fibCollection.showSelf(true, animated: true, handler: nil)
+    func showCollection(_ type: CollectionType) {
+        switch type {
+        case .prime:
+            fibCollection.showSelf(false, animated: true) { [weak self] state in
+                guard let self = self else { return }
+                self.primeCollection.showSelf(true, animated: true, handler: nil)
+            }
+        case .fibonacci:
+            primeCollection.showSelf(false, animated: true) { [weak self] state in
+                guard let self = self else { return }
+                self.fibCollection.showSelf(true, animated: true, handler: nil)
+            }
         }
     }
     
