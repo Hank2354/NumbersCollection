@@ -1,5 +1,5 @@
 //
-//  NumGeneratorService.swift
+//  NumPrimeGenerator.swift
 //  NumbersCollection
 //
 //  Created by Vladislav Mashkov on 01.07.2022.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class NumGeneratorService {
+final class NumPrimeGenerator {
     // MARK: - Singleton
-    static let shared: NumGeneratorInterface = NumGeneratorService()
+    static let shared: NumGeneratorInterface = NumPrimeGenerator()
     private init() {}
     
     // MARK: - Properties
@@ -30,50 +30,20 @@ final class NumGeneratorService {
         guard n % 2 != 0 else { return false }
         return !stride(from: 3, through: Int(sqrt(Double(n))), by: 2).contains { n % $0 == 0 }
     }
-    
-    /**
-     Данный метод позволяет получить следующее число фибоначчи после двух предыдущих, переденных в качестве пары целых чисел
-     
-     - parameter pair: Пара последних двух чисел из ряда фибоначчи
-     - returns: Следующее число в ряду
-     - warning: Сложность алгоритма O(1)
-     
-     */
-    private func fibonacciNextItem(from pair: (Int, Int)) -> Int {
-        if pair.0 <= Int.max - pair.1 {
-        return pair.0 + pair.1
-        } else {
-            return pair.1
-        }
-    }
 }
 
-extension NumGeneratorService: NumGeneratorInterface {
+extension NumPrimeGenerator: NumGeneratorInterface {
     
     // O((Sqrt(n)/2)^2) -> O(n/4)
-    func getPrimeNumbers(from initValue: Int) -> [Int] {
-        var values = [Int]()
-        var checkingValue = initValue + 1
-        while values.count < packageSize {
-            if isPrime(checkingValue) { values.append(checkingValue) }
-            if checkingValue < Int.max { checkingValue += 1 }
-        }
-        return values
+    func getNumbers(from initValue: NumGeneratorInitValue) -> [Int] {
+        if case let .prime(value) = initValue {
+            var values = [Int]()
+            var checkingValue = value + 1
+            while values.count < packageSize {
+                if isPrime(checkingValue) { values.append(checkingValue) }
+                if checkingValue < Int.max { checkingValue += 1 }
+            }
+            return values
+        } else { return [] }
     }
-    
-    // O(n)
-    func getFibanacciNumbers(from initPair: (Int, Int)) -> [Int] {
-        var values = [Int]()
-        if initPair.0 == 0 || initPair.1 == 1 { values.append(contentsOf: [initPair.0, initPair.1]) }
-        var fibPair = initPair
-        while values.count < packageSize {
-            let nextFibValue = fibonacciNextItem(from: fibPair)
-            let nextPair = (fibPair.1, nextFibValue)
-            values.append(nextFibValue)
-            fibPair = nextPair
-        }
-        return values
-    }
-    
-    
 }

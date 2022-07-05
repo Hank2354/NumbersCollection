@@ -9,12 +9,12 @@ import Foundation
 import UIKit
 
 protocol NumbersCollectionDelegate: AnyObject {
-    func didDisplayPaginatorDetectorCell(_ type: CollectionType)
+    func didDisplayPaginatorDetectorCell()
+    func didAppear()
 }
 
 protocol NumbersCollectionProtocol: UICollectionView {
     var controlDelegate: NumbersCollectionDelegate? { get set }
-    var collectionType: CollectionType { get }
     
     func showSelf(_ isShow: Bool, animated: Bool, handler: ((Bool) -> ())?)
     func insertNewNumbers(_ numbers: [Int])
@@ -23,12 +23,10 @@ protocol NumbersCollectionProtocol: UICollectionView {
 final class NumbersCollection: UICollectionView {
     // MARK: - Properties
     weak var controlDelegate: NumbersCollectionDelegate?
-    internal var collectionType: CollectionType
     private var numbers = [Int]()
     
     // MARK: - Init
-    init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout, type: CollectionType) {
-        self.collectionType = type
+    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
         configureCollection()
     }
@@ -40,7 +38,8 @@ final class NumbersCollection: UICollectionView {
     // MARK: - Private methods
     private func configureCollection() {
         backgroundColor = Constants.backgroundColor
-        register(NumCell.self, forCellWithReuseIdentifier: Constants.cellID)
+        let reuseCell = UINib(nibName: Constants.cellNibName, bundle: nil)
+        register(reuseCell, forCellWithReuseIdentifier: Constants.cellID)
         dataSource = self
         delegate = self
         if let layout = collectionViewLayout as? UICollectionViewFlowLayout {
@@ -49,6 +48,21 @@ final class NumbersCollection: UICollectionView {
             layout.scrollDirection = .vertical
         }
         
+    }
+    
+    /**
+     Определить цвет ячейки по указанному индексу используя шахматный стиль в 2 колонки
+     Получаем остаток от деления на указанного индекса на 4, и будем получать повторяющуюся последовательность
+     0, 1, 2, 3, 0, 1, 2 ......
+     Каждый два идущих подряд индекса, начиная с 1 должны быть одного цвета, возвращаем true если индекс 1 или 2, тогда получим
+     шахматный порядок, начиная со светлой ячейки. 
+     
+     - parameter index: IndexPath целевой ячейки.
+     - returns: Возвращает true для белой ячейки
+     */
+    private func isWhiteCell(index: IndexPath) -> Bool {
+        let mod = index.item % 4
+        return (mod == 1 || mod == 2)
     }
 }
 
@@ -63,6 +77,7 @@ extension NumbersCollection: NumbersCollectionProtocol {
                 guard let self = self else { return }
                 self.isUserInteractionEnabled = isShow
                 handler?(state)
+                if isShow { self.controlDelegate?.didAppear() }
             }
         }
     }
@@ -88,16 +103,8 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? NumCell
         guard let cell = cell else { return UICollectionViewCell() }
         
-        // Получаем значения четной строки, и четного индекса в строке. В каждой строке левый элемент будет четным, и нечетным в правой
-        // Для четных строк - левый элемент белый, правый - черный
-        // Для нечетных строк - наоборот
-        let isEvenIndex = indexPath.row % 2 == 0
-        let isEvenRow = indexPath.row / 2 % 2 == 0
-        
-        if isEvenRow && isEvenIndex { cell.backgroundColor = Constants.lightCellColor }
-        else if isEvenRow && !isEvenIndex { cell.backgroundColor = Constants.darkCellColor }
-        else if !isEvenRow && isEvenIndex { cell.backgroundColor = Constants.darkCellColor }
-        else { cell.backgroundColor = Constants.lightCellColor }
+        cell.backgroundColor = isWhiteCell(index: indexPath) ?
+        Constants.darkCellColor : Constants.lightCellColor
         
         cell.setNum(numbers[indexPath.row])
         return cell
@@ -113,7 +120,7 @@ extension NumbersCollection: UICollectionViewDelegate, UICollectionViewDataSourc
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if indexPath.row + 1 == numbers.count - Constants.paginationDetectorPreset {
-            controlDelegate?.didDisplayPaginatorDetectorCell(collectionType)
+            controlDelegate?.didDisplayPaginatorDetectorCell()
         }
     }
     
@@ -132,8 +139,9 @@ extension NumbersCollection {
         static var backgroundColor: UIColor { .clear }
         
         static var cellID: String { .init(describing: NumCell.self) }
+        static var cellNibName: String { "NumCellLayout" }
         
         static var paginationDetectorPreset: Int { 12 }
-        static var defaultAnimationDuration: CGFloat { 0.2 }
+        static var defaultAnimationDuration: CGFloat { 0.3 }
     }
 }
