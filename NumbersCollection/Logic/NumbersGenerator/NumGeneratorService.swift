@@ -64,6 +64,7 @@ extension NumGeneratorService: NumGeneratorInterface {
     // O(n)
     func getFibanacciNumbers(from initPair: (Int, Int)) -> [Int] {
         var values = [Int]()
+        if initPair.0 == 0 || initPair.1 == 1 { values.append(contentsOf: [initPair.0, initPair.1]) }
         var fibPair = initPair
         while values.count < packageSize {
             let nextFibValue = fibonacciNextItem(from: fibPair)
