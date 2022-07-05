@@ -16,6 +16,7 @@ protocol NumbersViewDelegate: AnyObject {
 protocol NumbersViewProtocol: UIView {
     var delegate: NumbersViewDelegate? { get set }
     
+    func configure(with segmentIndex: Int)
     func showPrimeCollection()
     func showFibanacciCollection()
     func insertNewNumbers(_ numbers: [Int], into collection: CollectionType)
@@ -34,7 +35,6 @@ final class NumbersView: UIView {
     private lazy var segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: segmentItems.map { $0.rawValue })
         control.translatesAutoresizingMaskIntoConstraints = false
-        control.selectedSegmentIndex = 0
         control.addTarget(self, action: #selector(handleSegment(_:)), for: .valueChanged)
         return control
     }()
@@ -106,6 +106,12 @@ final class NumbersView: UIView {
 
 // MARK: - Protocol execution
 extension NumbersView: NumbersViewProtocol {
+    func configure(with segmentIndex: Int) {
+        segmentedControl.selectedSegmentIndex = segmentIndex
+        guard !segmentItems.isEmpty else { return }
+        delegate?.didSelectSegment(segmentItems[segmentIndex])
+    }
+    
     func showPrimeCollection() {
         fibCollection.showSelf(false, animated: true) { [weak self] state in
             guard let self = self else { return }
@@ -140,6 +146,15 @@ extension NumbersView: NumbersCollectionDelegate {
                 let pair = (fibanacciNumbers[fibanacciNumbers.count - 1], fibanacciNumbers[fibanacciNumbers.count - 2])
                 delegate?.loadMoreFibanacciNumbers(from: pair)
             }
+        }
+    }
+    
+    func didAppear(_ type: CollectionType) {
+        switch type {
+        case .prime:
+            if primeNumbers.isEmpty { delegate?.loadMorePrimeNumbers(from: 0) }
+        case .fibonacci:
+            if fibanacciNumbers.isEmpty { delegate?.loadMoreFibanacciNumbers(from: (0, 1)) }
         }
     }
 }

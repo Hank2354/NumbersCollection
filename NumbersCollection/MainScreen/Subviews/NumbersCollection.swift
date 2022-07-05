@@ -10,6 +10,7 @@ import UIKit
 
 protocol NumbersCollectionDelegate: AnyObject {
     func didDisplayPaginatorDetectorCell(_ type: CollectionType)
+    func didAppear(_ type: CollectionType)
 }
 
 protocol NumbersCollectionProtocol: UICollectionView {
@@ -78,6 +79,7 @@ extension NumbersCollection: NumbersCollectionProtocol {
                 guard let self = self else { return }
                 self.isUserInteractionEnabled = isShow
                 handler?(state)
+                if isShow { self.controlDelegate?.didAppear(self.collectionType) }
             }
         }
     }
@@ -141,6 +143,6 @@ extension NumbersCollection {
         static var cellID: String { .init(describing: NumCell.self) }
         
         static var paginationDetectorPreset: Int { 12 }
-        static var defaultAnimationDuration: CGFloat { 0.2 }
+        static var defaultAnimationDuration: CGFloat { 0.3 }
     }
 }

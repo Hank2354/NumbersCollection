@@ -15,7 +15,7 @@ final class NumbersController: UIViewController {
 
     // MARK: - Properties
     private let contentView: NumbersViewProtocol = NumbersView(frame: .zero, segmentItems: ConfigConstants.segmentedItems)
-    internal var selectedType: CollectionType = .prime
+    internal var selectedType: CollectionType = ConfigConstants.startSegment
     
     // MARK: - Lifecycle
     override func loadView() {
@@ -37,12 +37,8 @@ final class NumbersController: UIViewController {
     
     private func startLogic() {
         NumGeneratorService.shared.packageSize = ConfigConstants.defaultPacketSize
-        
-        let newNumbersPrime = NumGeneratorService.shared.getPrimeNumbers(from: 0)
-        let newNumbersFib = NumGeneratorService.shared.getFibanacciNumbers(from: (0, 1))
-        
-        contentView.insertNewNumbers(newNumbersPrime, into: .prime)
-        contentView.insertNewNumbers(newNumbersFib, into: .fibonacci)
+        contentView.configure(with: ConfigConstants.segmentedItems.firstIndex(of: selectedType) ??
+                              ConfigConstants.segmentedItems.startIndex)
     }
 }
 
@@ -88,9 +84,8 @@ extension NumbersController {
         static var mainTitle: String = "Числовой контроллер"
         static var viewBackgroundColor: UIColor { .systemGray3 }
         static var segmentedItems: [CollectionType] { [.prime, .fibonacci] }
+        static var startSegment: CollectionType { segmentedItems[segmentedItems.startIndex] }
         static var defaultPacketSize: Int { 30 }
-        static var primeInitial: Int { 0 }
-        static var fibonacciInitial: (Int, Int) { (0, 1) }
     }
 }
 
