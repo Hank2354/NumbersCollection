@@ -20,6 +20,7 @@
 		412CC24A286F01630094749C /* NumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC249286F01630094749C /* NumCell.swift */; };
 		412CC250286F17DC0094749C /* NumbersEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC24F286F17DC0094749C /* NumbersEntities.swift */; };
 		412CC2E62874562A0094749C /* NumFibonacciGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC2E52874562A0094749C /* NumFibonacciGenerator.swift */; };
+		412CC32F287489750094749C /* NumCellLayout.xib in Resources */ = {isa = PBXBuildFile; fileRef = 412CC32E287489740094749C /* NumCellLayout.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		412CC249286F01630094749C /* NumCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumCell.swift; sourceTree = "<group>"; };
 		412CC24F286F17DC0094749C /* NumbersEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersEntities.swift; sourceTree = "<group>"; };
 		412CC2E52874562A0094749C /* NumFibonacciGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumFibonacciGenerator.swift; sourceTree = "<group>"; };
+		412CC32E287489740094749C /* NumCellLayout.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NumCellLayout.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +134,7 @@
 			children = (
 				412CC247286EFFC60094749C /* NumbersCollection.swift */,
 				412CC249286F01630094749C /* NumCell.swift */,
+				412CC32E287489740094749C /* NumCellLayout.xib */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -194,6 +197,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				412CC32F287489750094749C /* NumCellLayout.xib in Resources */,
 				412CC230286EF5250094749C /* LaunchScreen.storyboard in Resources */,
 				412CC23C286EF5C00094749C /* .gitignore in Resources */,
 				412CC22D286EF5250094749C /* Assets.xcassets in Resources */,

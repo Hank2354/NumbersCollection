@@ -38,7 +38,8 @@ final class NumbersCollection: UICollectionView {
     // MARK: - Private methods
     private func configureCollection() {
         backgroundColor = Constants.backgroundColor
-        register(NumCell.self, forCellWithReuseIdentifier: Constants.cellID)
+        let reuseCell = UINib(nibName: Constants.cellNibName, bundle: nil)
+        register(reuseCell, forCellWithReuseIdentifier: Constants.cellID)
         dataSource = self
         delegate = self
         if let layout = collectionViewLayout as? UICollectionViewFlowLayout {
@@ -138,6 +139,7 @@ extension NumbersCollection {
         static var backgroundColor: UIColor { .clear }
         
         static var cellID: String { .init(describing: NumCell.self) }
+        static var cellNibName: String { "NumCellLayout" }
         
         static var paginationDetectorPreset: Int { 12 }
         static var defaultAnimationDuration: CGFloat { 0.3 }
