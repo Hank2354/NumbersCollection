@@ -9,8 +9,7 @@ import UIKit
 
 protocol NumbersViewDelegate: AnyObject {
     func didSelectSegment(_ segment: Any)
-    func loadMorePrimeNumbers(from lastNumber: Int)
-    func loadMoreFibanacciNumbers(from lastPair: (Int, Int))
+    func loadMoreNumbers(_ initValues: NumGeneratorInitValue)
 }
 
 protocol NumbersViewProtocol: UIView {
@@ -140,11 +139,11 @@ extension NumbersView: NumbersCollectionDelegate {
         switch type {
         case .prime:
             guard let lastNumber = primeNumbers.last else { return }
-            delegate?.loadMorePrimeNumbers(from: lastNumber)
+            delegate?.loadMoreNumbers(.prime(lastNumber))
         case .fibonacci:
             if fibanacciNumbers.count >= 2 {
                 let pair = (fibanacciNumbers[fibanacciNumbers.count - 1], fibanacciNumbers[fibanacciNumbers.count - 2])
-                delegate?.loadMoreFibanacciNumbers(from: pair)
+                delegate?.loadMoreNumbers(.fibonacci(pair.0, pair.1))
             }
         }
     }
@@ -152,9 +151,9 @@ extension NumbersView: NumbersCollectionDelegate {
     func didAppear(_ type: CollectionType) {
         switch type {
         case .prime:
-            if primeNumbers.isEmpty { delegate?.loadMorePrimeNumbers(from: 0) }
+            if primeNumbers.isEmpty { delegate?.loadMoreNumbers(.prime(0)) }
         case .fibonacci:
-            if fibanacciNumbers.isEmpty { delegate?.loadMoreFibanacciNumbers(from: (0, 1)) }
+            if fibanacciNumbers.isEmpty { delegate?.loadMoreNumbers(.fibonacci(0, 1)) }
         }
     }
 }

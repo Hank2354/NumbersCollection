@@ -36,7 +36,6 @@ final class NumbersController: UIViewController {
     }
     
     private func startLogic() {
-        NumGeneratorService.shared.packageSize = ConfigConstants.defaultPacketSize
         contentView.configure(with: ConfigConstants.segmentedItems.firstIndex(of: selectedType) ??
                               ConfigConstants.segmentedItems.startIndex)
     }
@@ -54,23 +53,16 @@ extension NumbersController: NumbersViewDelegate {
         contentView.showCollection(selectedType)
     }
     
-    func loadMorePrimeNumbers(from lastNumber: Int) {
-        // Запускаем в утилити потоке алгоритм подбора новых чисел
+    func loadMoreNumbers(_ initValues: NumGeneratorInitValue) {
         let utilityQueue = DispatchQueue.global(qos: .utility)
         utilityQueue.async { [weak self] in
             guard let self = self else { return }
-            let newNumbers = NumGeneratorService.shared.getPrimeNumbers(from: lastNumber)
-            self.contentView.insertNewNumbers(newNumbers, into: .prime)
-        }
-    }
-    
-    func loadMoreFibanacciNumbers(from lastPair: (Int, Int)) {
-        // Запускаем в утилити потоке алгоритм подбора новых чисел
-        let utilityQueue = DispatchQueue.global(qos: .utility)
-        utilityQueue.async { [weak self] in
-            guard let self = self else { return }
-            let newNumbers = NumGeneratorService.shared.getFibanacciNumbers(from: lastPair)
-            self.contentView.insertNewNumbers(newNumbers, into: .fibonacci)
+            switch self.selectedType {
+            case .prime:
+                self.contentView.insertNewNumbers(NumPrimeGenerator.shared.getNumbers(from: initValues), into: self.selectedType)
+            case .fibonacci:
+                self.contentView.insertNewNumbers(NumFibonacciGenerator.shared.getNumbers(from: initValues), into: self.selectedType)
+            }
         }
     }
 }

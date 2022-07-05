@@ -12,13 +12,14 @@
 		412CC22D286EF5250094749C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 412CC22C286EF5250094749C /* Assets.xcassets */; };
 		412CC230286EF5250094749C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 412CC22E286EF5250094749C /* LaunchScreen.storyboard */; };
 		412CC23C286EF5C00094749C /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 412CC23B286EF5C00094749C /* .gitignore */; };
-		412CC23F286EF60D0094749C /* NumGeneratorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC23E286EF60D0094749C /* NumGeneratorService.swift */; };
+		412CC23F286EF60D0094749C /* NumPrimeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC23E286EF60D0094749C /* NumPrimeGenerator.swift */; };
 		412CC241286EF6180094749C /* NumGeneratorInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC240286EF6180094749C /* NumGeneratorInterface.swift */; };
 		412CC243286EF6580094749C /* NumbersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC242286EF6580094749C /* NumbersView.swift */; };
 		412CC245286EF6600094749C /* NumbersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC244286EF6600094749C /* NumbersController.swift */; };
 		412CC248286EFFC60094749C /* NumbersCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC247286EFFC60094749C /* NumbersCollection.swift */; };
 		412CC24A286F01630094749C /* NumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC249286F01630094749C /* NumCell.swift */; };
 		412CC250286F17DC0094749C /* NumbersEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC24F286F17DC0094749C /* NumbersEntities.swift */; };
+		412CC2E62874562A0094749C /* NumFibonacciGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412CC2E52874562A0094749C /* NumFibonacciGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,13 +30,14 @@
 		412CC22F286EF5250094749C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		412CC231286EF5250094749C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		412CC23B286EF5C00094749C /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		412CC23E286EF60D0094749C /* NumGeneratorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumGeneratorService.swift; sourceTree = "<group>"; };
+		412CC23E286EF60D0094749C /* NumPrimeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumPrimeGenerator.swift; sourceTree = "<group>"; };
 		412CC240286EF6180094749C /* NumGeneratorInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumGeneratorInterface.swift; sourceTree = "<group>"; };
 		412CC242286EF6580094749C /* NumbersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersView.swift; sourceTree = "<group>"; };
 		412CC244286EF6600094749C /* NumbersController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersController.swift; sourceTree = "<group>"; };
 		412CC247286EFFC60094749C /* NumbersCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersCollection.swift; sourceTree = "<group>"; };
 		412CC249286F01630094749C /* NumCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumCell.swift; sourceTree = "<group>"; };
 		412CC24F286F17DC0094749C /* NumbersEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersEntities.swift; sourceTree = "<group>"; };
+		412CC2E52874562A0094749C /* NumFibonacciGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumFibonacciGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +120,8 @@
 		412CC23D286EF5F00094749C /* NumbersGenerator */ = {
 			isa = PBXGroup;
 			children = (
-				412CC23E286EF60D0094749C /* NumGeneratorService.swift */,
+				412CC23E286EF60D0094749C /* NumPrimeGenerator.swift */,
+				412CC2E52874562A0094749C /* NumFibonacciGenerator.swift */,
 				412CC240286EF6180094749C /* NumGeneratorInterface.swift */,
 			);
 			path = NumbersGenerator;
@@ -206,7 +209,8 @@
 			files = (
 				412CC24A286F01630094749C /* NumCell.swift in Sources */,
 				412CC245286EF6600094749C /* NumbersController.swift in Sources */,
-				412CC23F286EF60D0094749C /* NumGeneratorService.swift in Sources */,
+				412CC23F286EF60D0094749C /* NumPrimeGenerator.swift in Sources */,
+				412CC2E62874562A0094749C /* NumFibonacciGenerator.swift in Sources */,
 				412CC243286EF6580094749C /* NumbersView.swift in Sources */,
 				412CC250286F17DC0094749C /* NumbersEntities.swift in Sources */,
 				412CC248286EFFC60094749C /* NumbersCollection.swift in Sources */,

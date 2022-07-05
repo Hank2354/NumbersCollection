@@ -11,3 +11,8 @@ enum CollectionType: String {
     case prime = "Простые"
     case fibonacci = "Фибоначчи"
 }
+
+enum NumGeneratorInitValue {
+    case prime(Int)
+    case fibonacci(Int, Int)
+}
